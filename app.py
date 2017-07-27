@@ -32,13 +32,14 @@ def webhook():
 
 
 def processRequest(req):
-    if req.get("result").get("action") != "yahooWeatherForecast":
+    if req.get("result").get("action") != "search_property":
         return {}
     global city_names
     city_names=processlocation(req)
     global QR
     global intent_name
     intent_name=processIntentName(req)
+
     if "ChooseCity" in intent_name:        
         QR[0]="Sector in "+city_names
         QR[1]="Other City?Specify"
@@ -87,6 +88,15 @@ def processRequest(req):
         QR[4]="Land Area"
         QR[5]="Property Type" 
         QR[6]="Change Location"
+    elif "serach_property" in intent_name:
+	R[0]="(Y)"
+        QR[1]="Other Range?Specify"
+        QR[2]="Hot Property"
+        QR[3]="Price Range"
+        QR[4]="Land Area"
+        QR[5]="Property Type" 
+        QR[6]="Change Location"
+
     city_names=processlocation(req)
     sector_names=processSector(req)
     property_type=processPropertyType(req)
@@ -122,12 +132,18 @@ def processIntentName(req):
     intent = parameters.get("intentName")
     return intent
 
-def processlocation(req):
+def process_location(req):
     result = req.get("result")
     parameters = result.get("parameters")
-    city = parameters.get("city")
-    return city
+    location = parameters.get("location")
+print(result)
+    return location
 
+def process_city(req):
+    result = req.get("result")
+    parameters = result.get("parameters")
+    city = parameters.get("")
+    return city
 def processSector(req):
     result = req.get("result")
     parameters = result.get("parameters")
@@ -253,7 +269,6 @@ def makeWebhookResult(data):
     variable3=str(row_number[2])
     variable4=str(row_number[3]) 
     
-    speech = "Here are some properties with your choice: https://www.aarz.pk/property-detail/"+row_slug[0] + " https://www.aarz.pk/property-detail/"+row_slug[1] +" Type: 'Hot Property','Price Range','Land Area','Change Location','Buy Property' "
     if "unable" in row_title[0]:
         message={
          "text":row_title[0],
@@ -537,7 +552,8 @@ def makeWebhookResult(data):
             }
         ]
     }
-            
+    speech = "Here are some properties with your choice: https://www.aarz.pk/search/"+row_slug[0] + " https://www.aarz.pk/property-detail/"+row_slug[1] +" Type: 'Hot Property','Price Range','Land Area','Change Location','Buy Property' "
+      
     return {
         "speech": speech,
         "displayText": speech,
@@ -545,6 +561,7 @@ def makeWebhookResult(data):
         # "contextOut": [],
         #"source": "apiai-weather-webhook-sample"
     }
+
 
 
 if __name__ == '__main__':
